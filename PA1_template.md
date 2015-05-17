@@ -1,32 +1,37 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 data <- read.csv("activity.csv", stringsAsFactor = F)
 data$date <- as.Date(data$date)
 ```
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 dailySteps <- aggregate(data$steps, list(date = data$date), sum)
 dailyStepsMean <- mean(dailySteps$x, na.rm=T)
 print(dailyStepsMean)
 ```
 
+```
+## [1] 10766.19
+```
+
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 library(ggplot2)
 qplot(dailySteps$x, binwidth=2500, xlab="Daily Steps", ylab="Count")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 ## Imputing missing values
-```{r}
+
+```r
 ## NA values imputed by replacing with the average steps for that interval
 naRows <- which(is.na(data$steps))
 dataNoNA <- data
@@ -39,13 +44,18 @@ for (row in naRows){
 ## Check if the data changes with the NA values imputed (not really)
 dailyStepsNoNA <- aggregate(dataNoNA$steps, list(date = dataNoNA$date), sum)
 qplot(dailyStepsNoNA$x, binwidth=2500, xlab="Daily Steps", ylab="Count")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
+```r
 dailyStepsNoNAMean <- mean(dailyStepsNoNA$x)
 dailyStepsNoNAMedian <- median(dailyStepsNoNA$x)
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 ## Add column for day type and fill it with Weekend or Weekday based on date
 weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 dayCheck <- sapply(dataNoNA$date, weekdays)
@@ -58,4 +68,6 @@ rm(weekdays, dayCheck)
 avgDaily <- aggregate(dataNoNA$steps, list(Day = dataNoNA$dayType, Interval = dataNoNA$interval), mean)
 qplot(Interval, x, facets=.~Day, data=avgDaily, geom="line", ylab="Steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
